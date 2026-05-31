@@ -47,9 +47,7 @@ class CScan:
         # If look is True, implement C-SCAN with look-ahead; otherwise, implement without look-ahead
         self.sort_requests()
         self.split_requests(look)
-        print (f"C-SCAN: {self.request_queue}")
         total_movement = self.calculate_total_head_movement()
-        print(f"Total head movement: {total_movement}")
 
         return (self.request_queue, total_movement)
 
