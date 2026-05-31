@@ -1,5 +1,10 @@
 import argparse
 
+from src.fifo import Fifo
+from src.sstf import Sstf
+from src.scan import Scan
+from src.c_scan import CScan
+
 
 class Simulator:
     def __init__(self, initial_position, initial_direction, disk_size, request_queue):
@@ -9,16 +14,25 @@ class Simulator:
         self.request_queue = request_queue
 
         # create classes and set attributes for each disk scheduling algorithm here
+        self.fifo = Fifo(initial_position, initial_direction, disk_size, request_queue)
+        self.sstf = Sstf(initial_position, initial_direction, disk_size, request_queue)
+        self.scan = Scan(initial_position, initial_direction, disk_size, request_queue)
+        self.cscan = CScan(
+            initial_position, initial_direction, disk_size, request_queue
+        )
 
     def run(self):
-        # call class attribute algorithms here.
-        print("Running the disk scheduling simulation...")
-        print(f"Initial Position: {self.initial_position}")
-        print(f"Initial Direction: {self.initial_direction}")
-        print(f"Disk Size: {self.disk_size}")
-        print(f"Request Queue: {self.request_queue}")
-        # Here you would implement the logic for the disk scheduling algorithms
-        # For example, you could implement FCFS, SSTF, SCAN, etc.
+
+        self.fifo.run()
+        self.sstf.run()
+
+        # True for SCAN with look, False for SCAN without look
+        self.scan.run(True)
+        self.scan.run(False)
+
+        # True for C-SCAN with look, False for C-SCAN without look
+        self.cscan.run(True)
+        self.cscan.run(False)
 
 
 def main():
