@@ -57,13 +57,7 @@ cd <repository-name>
 pip install uv
 ```
 
-### 3. Install Project Dependencies
-
-```bash
-uv sync
-```
-
-### 4. Install the CLI Entry Point
+### 3. Install the CLI Entry Point
 
 ```bash
 uv pip install -e .
