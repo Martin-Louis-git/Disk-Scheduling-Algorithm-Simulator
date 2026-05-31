@@ -38,12 +38,12 @@ class Simulator:
 
         # True for C-SCAN with look, False for C-SCAN without look
 
-        # cscan_service_array_no_look, cscan_total_seek_distance_no_look = self.cscan.run(
-        #     False
-        # )
-        # cscan_service_array_with_look, cscan_total_seek_distance_with_look = (
-        #     self.cscan.run(True)
-        # )
+        cscan_service_array_no_look, cscan_total_seek_distance_no_look = self.cscan.run(
+            False
+        )
+        cscan_service_array_with_look, cscan_total_seek_distance_with_look = (
+            self.cscan.run(True)
+        )
 
         self.__plot_movement(
             {
@@ -51,8 +51,8 @@ class Simulator:
                 # "SSTF", self.initial_position, sstf_service_array,
                 "SCAN (No Look)": scan_service_array_no_look,
                 "SCAN (With Look)": scan_service_array_with_look,
-                # "C-SCAN (No Look)", self.initial_position, cscan_service_array_no_look,
-                # "C-SCAN (With Look)", self.initial_position, cscan_service_array_with_look,
+                "C-SCAN (No Look)": cscan_service_array_no_look,
+                "C-SCAN (With Look)": cscan_service_array_with_look,
             },
             self.initial_position,
         )
@@ -60,10 +60,15 @@ class Simulator:
         self.__plot_seek_comparison(
             {
                 "FCFS": fcfs_result["total_seek_distance"],
+                # "SSTF": sstf_total_seek_distance,
                 "SCAN (No Look)": scan_total_seek_distance_no_look,
                 "SCAN (With Look)": scan_total_seek_distance_with_look,
+                "C-SCAN (No Look)": cscan_total_seek_distance_no_look,
+                "C-SCAN (With Look)": cscan_total_seek_distance_with_look,
             }
         )
+
+        plt.show()
 
     def __plot_movement(self, all_results, initial_position):
         plt.figure()
@@ -79,8 +84,6 @@ class Simulator:
         plt.ylabel("Cylinder Position")
         plt.grid(True)
         plt.legend()
-
-        plt.show()
 
     def __plot_seek_comparison(self, results):
         algorithms = list(results.keys())
