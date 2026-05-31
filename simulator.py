@@ -1,7 +1,7 @@
 import argparse
 import matplotlib.pyplot as plt
 
-from src.fifo import Fifo
+from src.fcfs import Fcfs
 from src.sstf import Sstf
 from src.scan import Scan
 from src.c_scan import CScan
@@ -15,7 +15,7 @@ class Simulator:
         self.request_queue = request_queue
 
         # create classes and set attributes for each disk scheduling algorithm here
-        self.fifo = Fifo(initial_position, initial_direction, disk_size, request_queue)
+        self.fcfs = Fcfs(initial_position, initial_direction, disk_size, request_queue)
         self.sstf = Sstf(initial_position, initial_direction, disk_size, request_queue)
         self.scan = Scan(initial_position, initial_direction, disk_size, request_queue)
         self.cscan = CScan(
@@ -24,7 +24,7 @@ class Simulator:
 
     def run(self):
 
-        # fifo_service_array, fifo_total_seek_distance = self.fifo.run()
+        fcfs_result = self.fcfs.run()
         # sstf_service_array, sstf_total_seek_distance = self.sstf.run()
 
         # True for SCAN with look, False for SCAN without look
@@ -47,7 +47,7 @@ class Simulator:
 
         self.__plot_movement(
             {
-                # "FIFO", self.initial_position, fifo_service_array,
+                "FCFS": fcfs_result["service_order"],
                 # "SSTF", self.initial_position, sstf_service_array,
                 "SCAN (No Look)": scan_service_array_no_look,
                 "SCAN (With Look)": scan_service_array_with_look,
@@ -59,6 +59,7 @@ class Simulator:
 
         self.__plot_seek_comparison(
             {
+                "FCFS": fcfs_result["total_seek_distance"],
                 "SCAN (No Look)": scan_total_seek_distance_no_look,
                 "SCAN (With Look)": scan_total_seek_distance_with_look,
             }
