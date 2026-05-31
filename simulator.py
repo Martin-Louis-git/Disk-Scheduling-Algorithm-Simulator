@@ -1,4 +1,5 @@
 import argparse
+import matplotlib.pyplot as plt
 
 from src.fifo import Fifo
 from src.sstf import Sstf
@@ -23,16 +24,72 @@ class Simulator:
 
     def run(self):
 
-        self.fifo.run()
-        self.sstf.run()
+        # fifo_service_array, fifo_total_seek_distance = self.fifo.run()
+        # sstf_service_array, sstf_total_seek_distance = self.sstf.run()
 
         # True for SCAN with look, False for SCAN without look
-        self.scan.run(True)
-        self.scan.run(False)
+
+        scan_service_array_no_look, scan_total_seek_distance_no_look = self.scan.run(
+            False
+        )
+        scan_service_array_with_look, scan_total_seek_distance_with_look = (
+            self.scan.run(True)
+        )
 
         # True for C-SCAN with look, False for C-SCAN without look
-        self.cscan.run(True)
-        self.cscan.run(False)
+
+        # cscan_service_array_no_look, cscan_total_seek_distance_no_look = self.cscan.run(
+        #     False
+        # )
+        # cscan_service_array_with_look, cscan_total_seek_distance_with_look = (
+        #     self.cscan.run(True)
+        # )
+
+        self.__plot_movement(
+            {
+                # "FIFO", self.initial_position, fifo_service_array,
+                # "SSTF", self.initial_position, sstf_service_array,
+                "SCAN (No Look)": scan_service_array_no_look,
+                "SCAN (With Look)": scan_service_array_with_look,
+                # "C-SCAN (No Look)", self.initial_position, cscan_service_array_no_look,
+                # "C-SCAN (With Look)", self.initial_position, cscan_service_array_with_look,
+            },
+            self.initial_position,
+        )
+
+        self.__plot_seek_comparison(
+            {
+                "SCAN (No Look)": scan_total_seek_distance_no_look,
+                "SCAN (With Look)": scan_total_seek_distance_with_look,
+            }
+        )
+
+    def __plot_movement(self, all_results, initial_position):
+        plt.figure()
+
+        for algorithm_name, served_order in all_results.items():
+            positions = [initial_position] + served_order
+            steps = list(range(len(positions)))
+
+            plt.plot(steps, positions, marker="o", label=algorithm_name)
+
+        plt.title("Disk Arm Movement Over Time")
+        plt.xlabel("Step")
+        plt.ylabel("Cylinder Position")
+        plt.grid(True)
+        plt.legend()
+
+        plt.show()
+
+    def __plot_seek_comparison(self, results):
+        algorithms = list(results.keys())
+        seeks = list(results.values())
+
+        plt.figure()
+        plt.bar(algorithms, seeks)
+        plt.title("Total Seek Distance Comparison")
+        plt.xlabel("Algorithm")
+        plt.ylabel("Total Seek Distance")
 
 
 def main():
