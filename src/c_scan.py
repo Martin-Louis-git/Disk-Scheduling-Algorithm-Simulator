@@ -51,9 +51,8 @@ class CScan:
         total_movement = self.calculate_total_head_movement()
         print(f"Total head movement: {total_movement}")
 
+        return (self.request_queue, total_movement)
 
-
-        pass
 
 if __name__ == "__main__":
     cscan = CScan(3, "dec", 200, [1, 2, 3, 4])
