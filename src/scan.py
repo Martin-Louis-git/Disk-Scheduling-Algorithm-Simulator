@@ -35,6 +35,7 @@ class Scan:
                 if next_request is None:
                     if not look:
                         total_steps += abs(current_position - max_request)
+                        order_of_service.append(max_request)
                         current_position = max_request
                     direction = "dec"
                     continue
@@ -54,6 +55,7 @@ class Scan:
                 if next_request is None:
                     if not look:
                         total_steps += abs(current_position - min_request)
+                        order_of_service.append(min_request)
                         current_position = min_request
                     direction = "inc"
                     continue

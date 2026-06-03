@@ -6,6 +6,8 @@ from src.fcfs import Fcfs
 from src.sstf import Sstf
 from src.scan import Scan
 from src.c_scan import CScan
+from src.lstf import Lstf
+from src.teleport import Teleport
 
 
 class Simulator:
@@ -54,6 +56,20 @@ class Simulator:
             request_queue,
             logger=self.logger,
         )
+        self.lstf = Lstf(
+            initial_position,
+            initial_direction,
+            disk_size,
+            request_queue,
+            logger=self.logger,
+        )
+        self.teleport = Teleport(
+            initial_position,
+            initial_direction,
+            disk_size,
+            request_queue,
+            logger=self.logger,
+        )
 
     def run(self):
         self.logger.info(
@@ -81,16 +97,27 @@ class Simulator:
             self.cscan.run(True)
         )
 
+        lstf_service_array, lstf_total_seek_distance = self.lstf.run()
+
+        teleport_service_array, teleport_total_steps = self.teleport.run()
+
+        self.__plot_movement({"FCFS": fcfs_service_array}, self.initial_position)
+        self.__plot_movement({"SSTF": sstf_service_array}, self.initial_position)
         self.__plot_movement(
-            {
-                "FCFS": fcfs_service_array,
-                "SSTF": sstf_service_array,
-                "SCAN (No Look)": scan_service_array_no_look,
-                "SCAN (With Look)": scan_service_array_with_look,
-                "C-SCAN (No Look)": cscan_service_array_no_look,
-                "C-SCAN (With Look)": cscan_service_array_with_look,
-            },
-            self.initial_position,
+            {"SCAN (No Look)": scan_service_array_no_look}, self.initial_position
+        )
+        self.__plot_movement(
+            {"SCAN (With Look)": scan_service_array_with_look}, self.initial_position
+        )
+        self.__plot_movement(
+            {"C-SCAN (No Look)": cscan_service_array_no_look}, self.initial_position
+        )
+        self.__plot_movement(
+            {"C-SCAN (With Look)": cscan_service_array_with_look}, self.initial_position
+        )
+        self.__plot_movement({"LSTF": lstf_service_array}, self.initial_position)
+        self.__plot_movement(
+            {"Teleport": teleport_service_array}, self.initial_position
         )
 
         self.__plot_seek_comparison(
@@ -101,18 +128,20 @@ class Simulator:
                 "SCAN (With Look)": scan_total_seek_distance_with_look,
                 "C-SCAN (No Look)": cscan_total_seek_distance_no_look,
                 "C-SCAN (With Look)": cscan_total_seek_distance_with_look,
+                "LSTF": lstf_total_seek_distance,
+                "Teleport": teleport_total_steps,
             }
         )
 
-        plt.show()
-
-    def __plot_movement(self, all_results, initial_position):
+    def __plot_movement(self, result, initial_position):
         plt.figure()
 
-        for algorithm_name, served_order in all_results.items():
-            positions = [initial_position] + served_order
-            steps = list(range(len(positions)))
-
+        algorithm_name, served_order = list(result.keys())[0], list(result.values())[0]
+        positions = [initial_position] + served_order
+        steps = list(range(len(positions)))
+        if str(algorithm_name) == "Teleport":
+            plt.scatter(steps, positions, marker="o", label=algorithm_name)
+        else:
             plt.plot(steps, positions, marker="o", label=algorithm_name)
 
         plt.title("Disk Arm Movement Over Time")
@@ -120,6 +149,8 @@ class Simulator:
         plt.ylabel("Cylinder Position")
         plt.grid(True)
         plt.legend()
+
+        plt.show()
 
     def __plot_seek_comparison(self, results):
         algorithms = list(results.keys())
