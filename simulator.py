@@ -1,4 +1,5 @@
 import argparse
+import logging
 import matplotlib.pyplot as plt
 
 from src.fcfs import Fcfs
@@ -13,58 +14,63 @@ class Simulator:
         self.initial_direction = initial_direction
         self.disk_size = disk_size
         self.request_queue = request_queue
+        self.logger = logging.getLogger(__name__)  # create once here
 
-        # create classes and set attributes for each disk scheduling algorithm here
-        self.fcfs = Fcfs(initial_position, initial_direction, disk_size, request_queue)
-        self.sstf = Sstf(initial_position, initial_direction, disk_size, request_queue)
-        self.scan = Scan(initial_position, initial_direction, disk_size, request_queue)
-        self.cscan = CScan(
-            initial_position, initial_direction, disk_size, request_queue
-        )
+        # create classes and set attributes for each disk scheduling algorithm and logger here
+        # self.fcfs = Fcfs(initial_position, initial_direction, disk_size, request_queue, logger=self.logger)
+        self.sstf = Sstf(initial_position, initial_direction, disk_size, request_queue, logger=self.logger)
+        # self.scan = Scan(initial_position, initial_direction, disk_size, request_queue, logger=self.logger)
+        # self.cscan = CScan(initial_position, initial_direction, disk_size, request_queue, logger=self.logger)
 
     def run(self):
+        self.logger.info(f"Starting simulation | head: {self.initial_position} | direction: {self.initial_direction} | disk size: {self.disk_size}")
+        self.logger.debug(f"Request queue: {self.request_queue}")
 
-        fcfs_result = self.fcfs.run()
-        # sstf_service_array, sstf_total_seek_distance = self.sstf.run()
+        # self.logger.info("--- FCFS ---")
+        # fcfs_result = self.fcfs.run()
 
-        # True for SCAN with look, False for SCAN without look
+        self.logger.info("--- SSTF ---")
+        sstf_service_array, sstf_total_seek_distance = self.sstf.run()
 
-        scan_service_array_no_look, scan_total_seek_distance_no_look = self.scan.run(
-            False
-        )
-        scan_service_array_with_look, scan_total_seek_distance_with_look = (
-            self.scan.run(True)
-        )
+        # self.logger.info("--- SCAN (No Look) ---")
+        # scan_service_array_no_look, scan_total_seek_distance_no_look = self.scan.run(False)
 
-        # True for C-SCAN with look, False for C-SCAN without look
+        # self.logger.info("--- SCAN (With Look) ---")
+        # scan_service_array_with_look, scan_total_seek_distance_with_look = self.scan.run(True)
 
-        cscan_service_array_no_look, cscan_total_seek_distance_no_look = self.cscan.run(
-            False
-        )
-        cscan_service_array_with_look, cscan_total_seek_distance_with_look = (
-            self.cscan.run(True)
-        )
+        # self.logger.info("--- C-SCAN (No Look) ---")
+        # cscan_service_array_no_look, cscan_total_seek_distance_no_look = self.cscan.run(False)
+
+        # self.logger.info("--- C-SCAN (With Look) ---")
+        # cscan_service_array_with_look, cscan_total_seek_distance_with_look = self.cscan.run(True)
+
+        # self.logger.info("--- RESULTS ---")
+        # self.logger.info(f"FCFS total seek distance: {fcfs_result['total_seek_distance']}")
+        # self.logger.info(f"SCAN (No Look) total seek distance: {scan_total_seek_distance_no_look}")
+        # self.logger.info(f"SCAN (With Look) total seek distance: {scan_total_seek_distance_with_look}")
+        # self.logger.info(f"C-SCAN (No Look) total seek distance: {cscan_total_seek_distance_no_look}")
+        # self.logger.info(f"C-SCAN (With Look) total seek distance: {cscan_total_seek_distance_with_look}")
 
         self.__plot_movement(
             {
-                "FCFS": fcfs_result["service_order"],
-                # "SSTF", self.initial_position, sstf_service_array,
-                "SCAN (No Look)": scan_service_array_no_look,
-                "SCAN (With Look)": scan_service_array_with_look,
-                "C-SCAN (No Look)": cscan_service_array_no_look,
-                "C-SCAN (With Look)": cscan_service_array_with_look,
+                # "FCFS": fcfs_result["service_order"],
+                "SSTF": sstf_service_array,
+            #     "SCAN (No Look)": scan_service_array_no_look,
+            #     "SCAN (With Look)": scan_service_array_with_look,
+            #     "C-SCAN (No Look)": cscan_service_array_no_look,
+            #     "C-SCAN (With Look)": cscan_service_array_with_look,
             },
             self.initial_position,
         )
 
         self.__plot_seek_comparison(
             {
-                "FCFS": fcfs_result["total_seek_distance"],
-                # "SSTF": sstf_total_seek_distance,
-                "SCAN (No Look)": scan_total_seek_distance_no_look,
-                "SCAN (With Look)": scan_total_seek_distance_with_look,
-                "C-SCAN (No Look)": cscan_total_seek_distance_no_look,
-                "C-SCAN (With Look)": cscan_total_seek_distance_with_look,
+                # "FCFS": fcfs_result["total_seek_distance"],
+                "SSTF": sstf_total_seek_distance,
+                # "SCAN (No Look)": scan_total_seek_distance_no_look,
+                # "SCAN (With Look)": scan_total_seek_distance_with_look,
+                # "C-SCAN (No Look)": cscan_total_seek_distance_no_look,
+                # "C-SCAN (With Look)": cscan_total_seek_distance_with_look,
             }
         )
 
@@ -98,6 +104,13 @@ class Simulator:
 
 def main():
 
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(levelname)s | %(name)s | %(message)s"
+    )
+
+    logging.getLogger("matplotlib").setLevel(logging.WARNING) #makes the graph debug logs calm down
+    
     arg_parser = argparse.ArgumentParser(description="OS Disk Scheduling Algorithms")
 
     arg_parser.add_argument(
