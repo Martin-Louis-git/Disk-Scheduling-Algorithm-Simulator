@@ -32,19 +32,56 @@ Similar to SCAN, but instead of traveling all the way to the disk boundary, the 
 
 Similar to C-SCAN, but the head only travels as far as the last pending request in the current direction. After servicing it, the head jumps directly to the lowest pending request and continues.
 
+#### 7. LSTF (Longest Seek Time First) 
+
+The next request serviced is the one farthest to the current disk head position. This generally increases seek time. Opposite to SSTF. 
+
+#### 8. Teleport 
+
+The disk arm teleports to the next request instantly!!
+
 ---
 
 ## Project Structure
 
 ```text
-TODO
+OS-DISK-SCHEDULING/
+│
+├── src/
+│   ├── __init__.py
+│   ├── fcfs.py
+│   ├── sstf.py
+│   ├── scan.py
+│   ├── c_scan.py
+│   ├── ltf.py
+│   └── teleport.py
+│
+├── simulator.py
+├── setup.py
+├── pyproject.toml
+├── uv.lock
+├── .python-version
+├── .gitignore
+└── README.md
 ```
+
+### Main Components
+
+- `simulator.py` contains the main simulator logic and CLI entry point.
+- `src/fcfs.py` implements the FCFS disk scheduling algorithm.
+- `src/sstf.py` implements the SSTF disk scheduling algorithm.
+- `src/scan.py` implements the SCAN disk scheduling algorithm.
+- `src/c_scan.py` implements the C-SCAN disk scheduling algorithm.
+- `src/ltf.py` implements the LTF algorithm.
+- `src/teleport.py` implements the Teleport scheduling approach.
+- `pyproject.toml` stores the project configuration and dependencies.
+- `uv.lock` locks dependency versions for reproducible installation.
 
 ---
 
 ## Installation
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone <repository-url>
@@ -53,24 +90,42 @@ cd <repository-name>
 
 ### 2. Install uv
 
-```bash
-pip install uv
-```
-
-### 3. Install the CLI Entry Point
+macOS / Linux:
 
 ```bash
-uv pip install -e .
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+
+Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+You can verify the installation with:
+
+```bash
+uv --version
+```
+
+### 3. Install project dependencies
+
+From the project root, run:
+
+```bash
+uv sync
+```
+
+This creates a virtual environment and installs the project dependencies.
 
 ---
 
 ## Usage
 
-The project exposes a command-line entry point:
+Run the simulator with:
 
 ```bash
-run-simulator
+uv run run-simulator -p -d -s -q ...
 ```
 
 ### Required Arguments
@@ -143,9 +198,3 @@ run-simulator \
 
 ---
 
-## Future Work
-
-* Add graphical visualization of head movement.
-* Export simulation results to files.
-* Add performance comparison tables.
-* Add automated testing and benchmarking.
