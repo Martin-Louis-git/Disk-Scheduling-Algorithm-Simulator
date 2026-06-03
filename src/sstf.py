@@ -1,5 +1,7 @@
 class Sstf:
-    def __init__(self, initial_position, initial_direction, disk_size, request_queue, logger=None):
+    def __init__(
+        self, initial_position, initial_direction, disk_size, request_queue, logger
+    ):
         self.initial_position = initial_position
         self.initial_direction = initial_direction
         self.disk_size = disk_size
@@ -7,18 +9,13 @@ class Sstf:
         self.logger = logger
 
     def run(self):
-        if self.logger:
-            self.logger.info("Running SSTF algorithm...")
+        self.logger.info("Running SSTF algorithm...")
 
         current = self.initial_position
         queue = self.request_queue.copy()
         output_array = [0] * len(queue)
         total = 0
         order = 0
-
-        if self.logger:
-            self.logger.debug(f"Initial head position: {current}")
-            self.logger.debug(f"Request queue: {queue}")
 
         while queue:
             i = 0
@@ -35,11 +32,7 @@ class Sstf:
             order += 1
             queue.remove(closest)
 
-            if self.logger:
-                self.logger.debug(f"Serving: {closest} | seek: {seek} | total: {total}")
-
-        if self.logger:
-            self.logger.info(f"Service order: {output_array}")
-            self.logger.info(f"Total seek distance: {total}")
+        self.logger.info(f"SSTF - Service order: {output_array}")
+        self.logger.info(f"SSTF - Total seek distance: {total}")
 
         return output_array, total

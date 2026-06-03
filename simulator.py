@@ -14,63 +14,93 @@ class Simulator:
         self.initial_direction = initial_direction
         self.disk_size = disk_size
         self.request_queue = request_queue
-        self.logger = logging.getLogger(__name__)  # create once here
+
+        logging.basicConfig(
+            level=logging.WARNING,
+            format="%(levelname)s | %(name)s | %(message)s",
+        )
+
+        logging.getLogger("matplotlib").propagate = False
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.DEBUG)
 
         # create classes and set attributes for each disk scheduling algorithm and logger here
-        # self.fcfs = Fcfs(initial_position, initial_direction, disk_size, request_queue, logger=self.logger)
-        self.sstf = Sstf(initial_position, initial_direction, disk_size, request_queue, logger=self.logger)
-        # self.scan = Scan(initial_position, initial_direction, disk_size, request_queue, logger=self.logger)
-        # self.cscan = CScan(initial_position, initial_direction, disk_size, request_queue, logger=self.logger)
+        self.fcfs = Fcfs(
+            initial_position,
+            initial_direction,
+            disk_size,
+            request_queue,
+            logger=self.logger,
+        )
+        self.sstf = Sstf(
+            initial_position,
+            initial_direction,
+            disk_size,
+            request_queue,
+            logger=self.logger,
+        )
+        self.scan = Scan(
+            initial_position,
+            initial_direction,
+            disk_size,
+            request_queue,
+            logger=self.logger,
+        )
+        self.cscan = CScan(
+            initial_position,
+            initial_direction,
+            disk_size,
+            request_queue,
+            logger=self.logger,
+        )
 
     def run(self):
-        self.logger.info(f"Starting simulation | head: {self.initial_position} | direction: {self.initial_direction} | disk size: {self.disk_size}")
+        self.logger.info(
+            f"Starting simulation | head: {self.initial_position} | direction: {self.initial_direction} | disk size: {self.disk_size}"
+        )
         self.logger.debug(f"Request queue: {self.request_queue}")
 
-        # self.logger.info("--- FCFS ---")
-        # fcfs_result = self.fcfs.run()
+        fcfs_service_array, fcfs_total_seek_distance = self.fcfs.run()
 
-        self.logger.info("--- SSTF ---")
         sstf_service_array, sstf_total_seek_distance = self.sstf.run()
 
-        # self.logger.info("--- SCAN (No Look) ---")
-        # scan_service_array_no_look, scan_total_seek_distance_no_look = self.scan.run(False)
+        scan_service_array_no_look, scan_total_seek_distance_no_look = self.scan.run(
+            False
+        )
 
-        # self.logger.info("--- SCAN (With Look) ---")
-        # scan_service_array_with_look, scan_total_seek_distance_with_look = self.scan.run(True)
+        scan_service_array_with_look, scan_total_seek_distance_with_look = (
+            self.scan.run(True)
+        )
 
-        # self.logger.info("--- C-SCAN (No Look) ---")
-        # cscan_service_array_no_look, cscan_total_seek_distance_no_look = self.cscan.run(False)
+        cscan_service_array_no_look, cscan_total_seek_distance_no_look = self.cscan.run(
+            False
+        )
 
-        # self.logger.info("--- C-SCAN (With Look) ---")
-        # cscan_service_array_with_look, cscan_total_seek_distance_with_look = self.cscan.run(True)
-
-        # self.logger.info("--- RESULTS ---")
-        # self.logger.info(f"FCFS total seek distance: {fcfs_result['total_seek_distance']}")
-        # self.logger.info(f"SCAN (No Look) total seek distance: {scan_total_seek_distance_no_look}")
-        # self.logger.info(f"SCAN (With Look) total seek distance: {scan_total_seek_distance_with_look}")
-        # self.logger.info(f"C-SCAN (No Look) total seek distance: {cscan_total_seek_distance_no_look}")
-        # self.logger.info(f"C-SCAN (With Look) total seek distance: {cscan_total_seek_distance_with_look}")
+        cscan_service_array_with_look, cscan_total_seek_distance_with_look = (
+            self.cscan.run(True)
+        )
 
         self.__plot_movement(
             {
-                # "FCFS": fcfs_result["service_order"],
+                "FCFS": fcfs_service_array,
                 "SSTF": sstf_service_array,
-            #     "SCAN (No Look)": scan_service_array_no_look,
-            #     "SCAN (With Look)": scan_service_array_with_look,
-            #     "C-SCAN (No Look)": cscan_service_array_no_look,
-            #     "C-SCAN (With Look)": cscan_service_array_with_look,
+                "SCAN (No Look)": scan_service_array_no_look,
+                "SCAN (With Look)": scan_service_array_with_look,
+                "C-SCAN (No Look)": cscan_service_array_no_look,
+                "C-SCAN (With Look)": cscan_service_array_with_look,
             },
             self.initial_position,
         )
 
         self.__plot_seek_comparison(
             {
-                # "FCFS": fcfs_result["total_seek_distance"],
+                "FCFS": fcfs_total_seek_distance,
                 "SSTF": sstf_total_seek_distance,
-                # "SCAN (No Look)": scan_total_seek_distance_no_look,
-                # "SCAN (With Look)": scan_total_seek_distance_with_look,
-                # "C-SCAN (No Look)": cscan_total_seek_distance_no_look,
-                # "C-SCAN (With Look)": cscan_total_seek_distance_with_look,
+                "SCAN (No Look)": scan_total_seek_distance_no_look,
+                "SCAN (With Look)": scan_total_seek_distance_with_look,
+                "C-SCAN (No Look)": cscan_total_seek_distance_no_look,
+                "C-SCAN (With Look)": cscan_total_seek_distance_with_look,
             }
         )
 
@@ -104,13 +134,6 @@ class Simulator:
 
 def main():
 
-    logging.basicConfig(
-        level=logging.DEBUG,
-        format="%(levelname)s | %(name)s | %(message)s"
-    )
-
-    logging.getLogger("matplotlib").setLevel(logging.WARNING) #makes the graph debug logs calm down
-    
     arg_parser = argparse.ArgumentParser(description="OS Disk Scheduling Algorithms")
 
     arg_parser.add_argument(
@@ -137,7 +160,7 @@ def main():
         type=int,
         help="Size of the disk (number of cylinders)",
         required=True,
-        default=199,
+        default=200,
     )
 
     arg_parser.add_argument(

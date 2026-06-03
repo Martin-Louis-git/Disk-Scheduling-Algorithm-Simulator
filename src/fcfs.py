@@ -2,13 +2,18 @@ from copy import deepcopy
 
 
 class Fcfs:
-    def __init__(self, initial_position, initial_direction, disk_size, request_queue):
+    def __init__(
+        self, initial_position, initial_direction, disk_size, request_queue, logger
+    ):
         self.initial_position = initial_position
         self.initial_direction = initial_direction
         self.disk_size = disk_size
         self.request_queue = request_queue
+        self.logger = logger
 
     def run(self):
+        self.logger.info("Running FCFS algorithm...")
+
         request_queue = deepcopy(self.request_queue)
         self._validate_input(request_queue)
 
@@ -16,17 +21,10 @@ class Fcfs:
         movement_path = [self.initial_position] + service_order
         total_seek_distance = self._calculate_total_seek_distance(movement_path)
 
-        print("Running FCFS algorithm...")
-        print(f"Service order: {service_order}")
-        print(f"Movement path: {movement_path}")
-        print(f"Total seek distance: {total_seek_distance}")
+        self.logger.info(f"FCFS - Service order: {service_order}")
+        self.logger.info(f"FCFS - Total seek distance: {total_seek_distance}")
 
-        return {
-            "algorithm": "FCFS",
-            "service_order": service_order,
-            "movement_path": movement_path,
-            "total_seek_distance": total_seek_distance,
-        }
+        return service_order, total_seek_distance
 
     def _validate_input(self, request_queue):
         if self.disk_size < 0:

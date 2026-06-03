@@ -1,6 +1,6 @@
 class Scan:
     def __init__(
-        self, initial_position, initial_direction, disk_size, request_queue, logger=None
+        self, initial_position, initial_direction, disk_size, request_queue, logger
     ):
         self.initial_position = initial_position
         self.initial_direction = initial_direction
@@ -9,6 +9,10 @@ class Scan:
         self.logger = logger
 
     def run(self, look: bool):
+
+        self.logger.info(
+            f"Running SCAN {'with look' if look else 'without look'} algorithm..."
+        )
 
         current_position = self.initial_position
         direction = self.initial_direction
@@ -59,10 +63,11 @@ class Scan:
                 request_queue.remove(next_request)
                 order_of_service.append(next_request)
 
-        if self.logger:
-            self.logger.info(
-                f"SCAN {'with look' if look else 'without look'}: Total steps = {total_steps}"
-            )
-            self.logger.info(f"Order of service: {order_of_service}")
+        self.logger.info(
+            f"SCAN {'with look' if look else 'without look'} - Order of service: {order_of_service}"
+        )
+        self.logger.info(
+            f"SCAN {'with look' if look else 'without look'} - Total steps = {total_steps}"
+        )
 
         return order_of_service, total_steps
