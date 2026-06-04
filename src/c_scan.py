@@ -5,6 +5,7 @@ class CScan:
         self.initial_position = initial_position
         self.initial_direction = initial_direction
         self.disk_size = disk_size
+        self.request_queue_base = request_queue.copy()
         self.request_queue = request_queue.copy()
         self.logger = logger
 
@@ -66,6 +67,8 @@ class CScan:
     def run(self, look: bool):
         # Implement the C-SCAN algorithm here
         # If look is True, implement C-SCAN with look-ahead; otherwise, implement without look-ahead
+
+        self.request_queue = self.request_queue_base.copy()
 
         self.logger.info(
             f"Running C-SCAN {'with look' if look else 'without look'} algorithm..."
